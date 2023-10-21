@@ -1,5 +1,6 @@
-package com.example.demo.service;
+package com.example.csv.service.impl;
 
+import com.example.csv.service.DateParserService;
 import com.joestelmach.natty.DateGroup;
 import com.joestelmach.natty.Parser;
 import org.springframework.stereotype.Service;
@@ -8,11 +9,11 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class DateParserService {
+public class DateParserServiceImpl implements DateParserService {
 
     private final Parser nattyParser;
 
-    public DateParserService() {
+    public DateParserServiceImpl() {
         this.nattyParser = new Parser();
     }
 

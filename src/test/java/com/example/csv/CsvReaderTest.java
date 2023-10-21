@@ -1,9 +1,10 @@
-package com.example.demo;
+package com.example.csv;
 
-import com.example.demo.exception.FutureDateException;
-import com.example.demo.model.Employee;
-import com.example.demo.service.CsvReader;
-import com.example.demo.service.DateParserService;
+import com.example.csv.exception.FutureDateException;
+import com.example.csv.model.Employee;
+import com.example.csv.service.CsvReader;
+import com.example.csv.service.impl.CsvReaderImpl;
+import com.example.csv.service.impl.DateParserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -23,7 +24,7 @@ public class CsvReaderTest {
     private CsvReader csvReader;
 
     @Mock
-    private DateParserService dateParserService;
+    private DateParserServiceImpl dateParserService;
 
     @BeforeEach
     public void setUp() {
@@ -72,10 +73,10 @@ public class CsvReaderTest {
     @Test
     public void testReadCsv_DateInFuture() {
         // Create an instance of DateParserService
-        dateParserService = new DateParserService();
+        dateParserService = new DateParserServiceImpl();
 
         // Inject DateParserService into CsvReader
-        csvReader = new CsvReader(dateParserService);
+        csvReader = new CsvReaderImpl(dateParserService);
         assertThrows(FutureDateException.class, () -> csvReader.readCsvFile("dateInFuture.csv"));
     }
 

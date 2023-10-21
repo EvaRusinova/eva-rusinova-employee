@@ -1,8 +1,8 @@
-package com.example.demo;
+package com.example.csv;
 
-import com.example.demo.model.Employee;
-import com.example.demo.service.CsvReader;
-import com.example.demo.service.EmployeeOverlappingService;
+import com.example.csv.model.Employee;
+import com.example.csv.service.CsvReader;
+import com.example.csv.service.EmployeeOverlappingService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.boot.ApplicationArguments;
@@ -26,6 +26,11 @@ public class DemoApplication implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+
+        // TODO: this method could be more generic and refactored to be called
+        //  the way that we provide fileName and Clazz type as follows:
+        // csvReader.readCsvFile("employee.csv", Employee.class);
+
         List<Employee> employees = csvReader.readCsvFile("static/" + "employee.csv");
 
         System.out.println("Parsed Employees:");
@@ -42,7 +47,7 @@ public class DemoApplication implements ApplicationRunner {
             System.out.println("No employee pairs found with overlapping project durations.");
         }
 
-        System.exit(1);
+//        System.exit(1);
     }
 
 }

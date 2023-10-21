@@ -1,11 +1,12 @@
-package com.example.demo.service;
+package com.example.csv.service.impl;
 
-import com.example.demo.exception.FutureDateException;
-import com.example.demo.model.Employee;
+import com.example.csv.exception.FutureDateException;
+import com.example.csv.model.Employee;
+import com.example.csv.service.CsvReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,11 +17,11 @@ import java.util.Date;
 import java.util.List;
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
-public class CsvReader {
+public class CsvReaderImpl implements CsvReader {
 
-    private final DateParserService dateParser;
+    private final DateParserServiceImpl dateParser;
 
     public List<Employee> readCsvFile(String fileName) throws IOException {
         ClassPathResource resource = new ClassPathResource(fileName);
