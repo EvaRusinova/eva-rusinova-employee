@@ -1,5 +1,6 @@
 package com.example.csv.service.impl;
 
+import com.example.csv.dto.EmployeeGridResponse;
 import com.example.csv.model.Employee;
 import com.example.csv.service.EmployeeOverlappingService;
 import com.example.csv.util.Constants;
@@ -13,7 +14,6 @@ import java.util.*;
 
 @Service
 public class EmployeeOverlappingServiceImpl implements EmployeeOverlappingService {
-
     /**
      * Method to find the pair of employees who have worked together on common projects
      * for the longest period of time.
@@ -66,6 +66,93 @@ public class EmployeeOverlappingServiceImpl implements EmployeeOverlappingServic
                 .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
                 // If no entry is found, return null
                 .orElse(null);
+    }
+
+    @Override
+        public Integer findProjectWithLongestDurationForPair(Pair<Pair<Integer, Integer>, Long> pair, List<Employee> employees) {
+            if (pair != null) {
+                Pair<Integer, Integer> employeePair = pair.getLeft();
+                Integer employeeId1 = employeePair.getLeft();
+                Integer employeeId2 = employeePair.getRight();
+
+                // Create a map to track the total days worked by each project
+                Map<Integer, Long> projectDaysWorked = new HashMap<>();
+
+                for (Employee employee : employees) {
+                    if ((employee.getEmployeeId().equals(employeeId1) || employee.getEmployeeId().equals(employeeId2)) &&
+                            employee.getProjectId() != null) {
+
+                        int projectId = employee.getProjectId();
+                        long daysWorked = excludeWeekendsAndHolidays(employee.getDateFrom(), employee.getDateTo());
+
+                        // Update the total days worked for this project
+                        projectDaysWorked.put(projectId, projectDaysWorked.getOrDefault(projectId, 0L) + daysWorked);
+                    }
+                }
+
+                // Find the project with the longest duration
+                Optional<Map.Entry<Integer, Long>> longestProject = projectDaysWorked.entrySet().stream()
+                        .max(Map.Entry.comparingByValue());
+
+                if (longestProject.isPresent()) {
+                    return longestProject.get().getKey();
+                }
+            }
+
+            // Return null if no project found
+            return null;
+        }
+
+
+    @Override
+    public List<EmployeeGridResponse> getCommonProjectsForPair(Pair<Pair<Integer, Integer>, Long> pair, List<Employee> employees) {
+        // Initialize a list to store the common projects of the pair
+        List<EmployeeGridResponse> result = new ArrayList<>();
+
+        if (pair != null) {
+            // Extract the employee IDs from the pair
+            Pair<Integer, Integer> employeePair = pair.getLeft();
+            Integer employeeId1 = employeePair.getLeft();
+            Integer employeeId2 = employeePair.getRight();
+
+            // Create a map to track the total days worked by each project
+            Map<Integer, Long> projectDaysWorked = new HashMap<>();
+
+            // Iterate over the employees to find the common projects
+            Set<Integer> processedProjects = new HashSet<>();
+
+            for (Employee employee : employees) {
+                if ((employee.getEmployeeId().equals(employeeId1) || employee.getEmployeeId().equals(employeeId2)) && !processedProjects.contains(employee.getProjectId())) {
+
+                    int projectId = employee.getProjectId();
+
+                    // Calculate the days worked for this project by the pair
+                    long daysWorked = excludeWeekendsAndHolidays(employee.getDateFrom(), employee.getDateTo());
+
+                    // Update the total days worked for this project
+                    projectDaysWorked.put(projectId, daysWorked);
+
+                    // Mark this project as processed to avoid double counting
+                    processedProjects.add(projectId);
+                }
+            }
+
+            // Create EmployeeGridResponse objects for each project
+            for (Map.Entry<Integer, Long> entry : projectDaysWorked.entrySet()) {
+                Integer projectId = entry.getKey();
+                Long totalDaysWorked = entry.getValue();
+
+                EmployeeGridResponse gridResponse = new EmployeeGridResponse();
+                gridResponse.setFirstEmployeeId(employeeId1);
+                gridResponse.setSecondEmployeeId(employeeId2);
+                gridResponse.setProjectId(projectId);
+                gridResponse.setTotalDaysWorked(totalDaysWorked);
+
+                result.add(gridResponse);
+            }
+        }
+
+        return result;
     }
 
     /**

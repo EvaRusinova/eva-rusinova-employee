@@ -23,9 +23,10 @@ public class CsvController {
     private final CsvReader csvReader;
     private final EmployeeOverlappingService employeeOverlappingService;
 
+    // Just for testing purposes and it is also visible in Swagger
     @PostMapping("/handleEmployees")
     public ResponseEntity<?> handleEmployeesFromCsv() throws IOException {
-        List<Employee> employees = csvReader.readCsvFile("static/" + "employee.csv");
+        List<Employee> employees = csvReader.readCsvFileByName("static/" + "employee.csv");
         Pair<Pair<Integer, Integer>, Long> longestWorkingPair = employeeOverlappingService.findLongestWorkingPair(employees);
         return ResponseEntity.ok(longestWorkingPair);
     }

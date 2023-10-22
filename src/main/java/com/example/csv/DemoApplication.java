@@ -29,9 +29,9 @@ public class DemoApplication implements ApplicationRunner {
 
         // TODO: this method could be more generic and refactored to be called
         //  the way that we provide fileName and Clazz type as follows:
-        // csvReader.readCsvFile("employee.csv", Employee.class);
+        //  csvReader.readCsvFile("employee.csv", Employee.class);
 
-        List<Employee> employees = csvReader.readCsvFile("static/" + "employee.csv");
+        List<Employee> employees = csvReader.readCsvFileByName("static/" + "employee.csv");
 
         System.out.println("Parsed Employees:");
         System.out.println(employees.stream().map(Object::toString).collect(Collectors.joining("\n")));
@@ -47,7 +47,6 @@ public class DemoApplication implements ApplicationRunner {
             System.out.println("No employee pairs found with overlapping project durations.");
         }
 
-//        System.exit(1);
     }
 
 }

@@ -7,10 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,14 +22,34 @@ public class CsvReaderImpl implements CsvReader {
 
     private final DateParserServiceImpl dateParser;
 
-    public List<Employee> readCsvFile(String fileName) throws IOException {
+    public List<Employee> readCsvFileByName(String fileName) throws IOException {
         ClassPathResource resource = new ClassPathResource(fileName);
         BufferedReader reader = new BufferedReader(new FileReader(resource.getFile()));
 
         List<Employee> employees = new ArrayList<>();
 
         String line;
-        boolean skipHeader = true;  // Assuming your CSV has a header
+        boolean skipHeader = true;
+
+        while ((line = reader.readLine()) != null) {
+            if (skipHeader) {
+                skipHeader = false;
+                continue;
+            }
+            employees.add(parseEmployeeFromCsvLine(line.trim().split(",\\s*")));
+        }
+        return employees;
+    }
+
+    @Override
+    public List<Employee> readCsvFile(MultipartFile file) throws IOException {
+        InputStream inputStream = file.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+        List<Employee> employees = new ArrayList<>();
+
+        String line;
+        boolean skipHeader = true;
 
         while ((line = reader.readLine()) != null) {
             if (skipHeader) {
@@ -45,8 +64,6 @@ public class CsvReaderImpl implements CsvReader {
     private Employee parseEmployeeFromCsvLine(String[] data) {
         Date dateFrom = convertToDate(dateParser.parseDate(data[2]));
         Date dateTo = convertToDate(dateParser.parseDate(data[3]));
-
-        // TODO: It will be nice to have date validator for cases like 2023-88-88
 
         // Check if the dates are in the future
         if (dateFrom.after(Date.from(Instant.now())) || dateTo.after(Date.from(Instant.now()))) {

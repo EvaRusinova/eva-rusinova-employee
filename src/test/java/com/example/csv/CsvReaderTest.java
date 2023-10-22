@@ -2,7 +2,6 @@ package com.example.csv;
 
 import com.example.csv.exception.FutureDateException;
 import com.example.csv.model.Employee;
-import com.example.csv.service.CsvReader;
 import com.example.csv.service.impl.CsvReaderImpl;
 import com.example.csv.service.impl.DateParserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CsvReaderTest {
 
     @InjectMocks
-    private CsvReader csvReader;
+    private CsvReaderImpl csvReader;
 
     @Mock
     private DateParserServiceImpl dateParserService;
@@ -35,7 +34,7 @@ public class CsvReaderTest {
     public void testReadCsv_ValidFile() throws IOException {
         Integer employeeId = 199;
         Integer projectId = 15;
-        List<Employee> result = csvReader.readCsvFile("test1.csv");
+        List<Employee> result = csvReader.readCsvFileByName("validFile.csv");
         Optional<Employee> employeeWithId199 = result.stream().filter(employee -> Objects.equals(employee.getEmployeeId(), employeeId)).findFirst();
 
         assertTrue(employeeWithId199.isPresent());
@@ -48,13 +47,13 @@ public class CsvReaderTest {
 
     @Test
     public void testReadCsv_EmptyFile() throws IOException {
-        List<Employee> result = csvReader.readCsvFile("emptyFile.csv");
+        List<Employee> result = csvReader.readCsvFileByName("emptyFile.csv");
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void testReadCsv_NullDateDefaultsToNow() throws IOException {
-        List<Employee> result = csvReader.readCsvFile("nullDateToInstantNow.csv");
+        List<Employee> result = csvReader.readCsvFileByName("nullDateToInstantNow.csv");
         assertEquals(result.size(), 1);
         Optional<Employee> firstEmployeeOptional = result.stream().findFirst();
         assertTrue(firstEmployeeOptional.isPresent());
@@ -67,7 +66,7 @@ public class CsvReaderTest {
     @Test
     public void testReadCsv_BadCsvFile() {
         // This test proves that if we have incorrect delimeters in the file it will fail
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> csvReader.readCsvFile("badCsvFile.csv"));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> csvReader.readCsvFileByName("badCsvFile.csv"));
     }
 
     @Test
@@ -77,7 +76,7 @@ public class CsvReaderTest {
 
         // Inject DateParserService into CsvReader
         csvReader = new CsvReaderImpl(dateParserService);
-        assertThrows(FutureDateException.class, () -> csvReader.readCsvFile("dateInFuture.csv"));
+        assertThrows(FutureDateException.class, () -> csvReader.readCsvFileByName("dateInFuture.csv"));
     }
 
 }

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>CSV File Processor</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>CSV File Processor</h1>
+
+<!-- File input button for choosing a CSV file -->
+<input type="file" id="csvFile" accept=".csv"><br><br>
+
+<!-- Button to trigger file processing -->
+<button id="processButton">Process File</button><br><br>
+
+<!-- Display the result or error message here -->
+<div id="result"></div>
+<div id="error"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const csvFileInput = document.getElementById("csvFile");
+        const processButton = document.getElementById("processButton");
+        const resultDiv = document.getElementById("result");
+        const errorDiv = document.getElementById("error");
+
+        processButton.addEventListener("click", function () {
+            // Check if a file has been selected
+            if (csvFileInput.files.length === 0) {
+                alert("Please select a CSV file.");
+                return;
+            }
+
+            // Create a FormData object to send the file
+            const formData = new FormData();
+            formData.append("file", csvFileInput.files[0]);
+
+            // Send a POST request to your server for file processing
+            fetch("/handleCsvFile", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    // Handle error response
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+                    });
+                }
+            })
+            .then(data => {
+                // Display the processed result in the resultDiv
+                const longestWorkingPair = data.longestWorkingPair;
+                const projectWithLongestDuration = data.projectWithLongestDuration;
+                const employeeGridResponseList = data.employeeGridResponseList;
+
+                if (longestWorkingPair) {
+                    const formattedLongestWorkingPair = longestWorkingPair.replace(/\(|\)/g, "").split(",");
+                    const employee1 = `Employee ID#${formattedLongestWorkingPair[0]}`;
+                    const employee2 = `Employee ID#${formattedLongestWorkingPair[1]}`;
+                    const daysWorked = `Days Worked ${formattedLongestWorkingPair[2]}`;
+                    resultDiv.innerHTML = `
+                        <p>Longest Working Pair:</p>
+                        <p>${employee1}, ${employee2}, ${daysWorked}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = "<p>No valid Longest Working Pair data found.</p>";
+                }
+
+                if (projectWithLongestDuration) {
+                    resultDiv.innerHTML += `
+                        <p>Longest Project for the Pair:</p>
+                        <p>Project ID ${projectWithLongestDuration}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML += "<p>No valid Project with Longest Duration data found.</p>";
+                }
+
+                if (employeeGridResponseList && employeeGridResponseList.length > 0) {
+                    const tableHtml = `
+                        <table>
+                            <tr>
+                                <th>Employee ID #1</th>
+                                <th>Employee ID #2</th>
+                                <th>Project ID</th>
+                                <th>Days Worked</th>
+                            </tr>
+                            ${employeeGridResponseList.map(response => `
+                                <tr>
+                                    <td>${response.firstEmployeeId}</td>
+                                    <td>${response.secondEmployeeId}</td>
+                                    <td>${response.projectId}</td>
+                                    <td>${response.totalDaysWorked}</td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    `;
+                    resultDiv.innerHTML += tableHtml;  // Display employeeGridResponseList
+                } else {
+                    resultDiv.innerHTML += "<p>No employee grid response data found.</p>";
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                errorDiv.innerHTML = "An error occurred while processing the file: " + error.message;
+            });
+        });
+    });
+</script>
+</body>
+</html>

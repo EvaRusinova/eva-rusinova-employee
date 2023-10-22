@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  # Spring Boot application
+  eva-rusinova-employee:
+    container_name: eva-rusinova-employee  # Sets the container name for the Spring Boot app service
+    build:
+      context: ../eva-rusinova-employee # Specifies the current directory as the build context
+      dockerfile: Dockerfile  # Specifies the Dockerfile to use for building the image
+    ports:
+      - "8080:8080"  # Maps port 8080 of the host to port 8080 of the container
