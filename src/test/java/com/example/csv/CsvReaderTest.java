@@ -32,6 +32,7 @@ public class CsvReaderTest {
 
     @Test
     public void testReadCsv_ValidFile() throws IOException {
+        //Test with a standard file
         Integer employeeId = 199;
         Integer projectId = 15;
         List<Employee> result = csvReader.readCsvFileByName("validFile.csv");
@@ -47,12 +48,14 @@ public class CsvReaderTest {
 
     @Test
     public void testReadCsv_EmptyFile() throws IOException {
+        //Test with empty file
         List<Employee> result = csvReader.readCsvFileByName("emptyFile.csv");
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void testReadCsv_NullDateDefaultsToNow() throws IOException {
+        //Test are the null dates are converted to current dates
         List<Employee> result = csvReader.readCsvFileByName("nullDateToInstantNow.csv");
         assertEquals(result.size(), 1);
         Optional<Employee> firstEmployeeOptional = result.stream().findFirst();
@@ -65,7 +68,7 @@ public class CsvReaderTest {
 
     @Test
     public void testReadCsv_BadCsvFile() {
-        // This test proves that if we have incorrect delimeters in the file it will fail
+        // This test proves that if we have incorrect delimiters in the file it will fail
         assertThrows(ArrayIndexOutOfBoundsException.class, () -> csvReader.readCsvFileByName("badCsvFile.csv"));
     }
 

@@ -31,7 +31,7 @@ public class DemoApplication implements ApplicationRunner {
         //  the way that we provide fileName and Clazz type as follows:
         //  csvReader.readCsvFile("employee.csv", Employee.class);
 
-        List<Employee> employees = csvReader.readCsvFileByName("static/" + "employee.csv");
+        List<Employee> employees = csvReader.readCsvFileByName("static/employee.csv");
 
         System.out.println("Parsed Employees:");
         System.out.println(employees.stream().map(Object::toString).collect(Collectors.joining("\n")));

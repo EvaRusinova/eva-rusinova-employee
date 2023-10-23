@@ -68,42 +68,49 @@ public class EmployeeOverlappingServiceImpl implements EmployeeOverlappingServic
                 .orElse(null);
     }
 
+    /**
+     * Method to find the project with the longest duration for the pair
+     *
+     * @return ProjectID
+     */
     @Override
-        public Integer findProjectWithLongestDurationForPair(Pair<Pair<Integer, Integer>, Long> pair, List<Employee> employees) {
-            if (pair != null) {
-                Pair<Integer, Integer> employeePair = pair.getLeft();
-                Integer employeeId1 = employeePair.getLeft();
-                Integer employeeId2 = employeePair.getRight();
+    public Integer findProjectWithLongestDurationForPair(Pair<Pair<Integer, Integer>, Long> pair, List<Employee> employees) {
+        if (pair != null) {
+            Pair<Integer, Integer> employeePair = pair.getLeft();
+            Integer employeeId1 = employeePair.getLeft();
+            Integer employeeId2 = employeePair.getRight();
 
-                // Create a map to track the total days worked by each project
-                Map<Integer, Long> projectDaysWorked = new HashMap<>();
+            // Create a map to track the total days worked by each project
+            Map<Integer, Long> projectDaysWorked = new HashMap<>();
 
-                for (Employee employee : employees) {
-                    if ((employee.getEmployeeId().equals(employeeId1) || employee.getEmployeeId().equals(employeeId2)) &&
-                            employee.getProjectId() != null) {
+            for (Employee employee : employees) {
+                if ((employee.getEmployeeId().equals(employeeId1) || employee.getEmployeeId().equals(employeeId2)) && employee.getProjectId() != null) {
 
-                        int projectId = employee.getProjectId();
-                        long daysWorked = excludeWeekendsAndHolidays(employee.getDateFrom(), employee.getDateTo());
+                    int projectId = employee.getProjectId();
+                    long daysWorked = excludeWeekendsAndHolidays(employee.getDateFrom(), employee.getDateTo());
 
-                        // Update the total days worked for this project
-                        projectDaysWorked.put(projectId, projectDaysWorked.getOrDefault(projectId, 0L) + daysWorked);
-                    }
-                }
-
-                // Find the project with the longest duration
-                Optional<Map.Entry<Integer, Long>> longestProject = projectDaysWorked.entrySet().stream()
-                        .max(Map.Entry.comparingByValue());
-
-                if (longestProject.isPresent()) {
-                    return longestProject.get().getKey();
+                    // Update the total days worked for this project
+                    projectDaysWorked.put(projectId, projectDaysWorked.getOrDefault(projectId, 0L) + daysWorked);
                 }
             }
 
-            // Return null if no project found
-            return null;
+            // Find the project with the longest duration
+            Optional<Map.Entry<Integer, Long>> longestProject = projectDaysWorked.entrySet().stream().max(Map.Entry.comparingByValue());
+
+            if (longestProject.isPresent()) {
+                return longestProject.get().getKey();
+            }
         }
 
+        // Return null if no project found
+        return null;
+    }
 
+    /**
+     * Method to find the project all common projects for the pair
+     *
+     * @return - gridResponse
+     */
     @Override
     public List<EmployeeGridResponse> getCommonProjectsForPair(Pair<Pair<Integer, Integer>, Long> pair, List<Employee> employees) {
         // Initialize a list to store the common projects of the pair

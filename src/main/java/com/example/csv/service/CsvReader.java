@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface CsvReader {
     List<Employee> readCsvFileByName(String fileName) throws IOException;
+
     List<Employee> readCsvFile(MultipartFile file) throws IOException;
 }
